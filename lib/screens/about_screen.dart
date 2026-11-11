@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Opened by name from the drawer: Navigator.pushNamed(context, '/about').
 class AboutScreen extends StatelessWidget {
@@ -10,13 +11,12 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('About the fair')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Stack layers children on top of each other. Positioned pins the
-          // title to the bottom-left corner of the banner.
           SizedBox(
             height: 160,
             child: Stack(
@@ -73,8 +73,55 @@ class AboutScreen extends StatelessWidget {
               'right from this app.',
             ),
           ),
+          const VersionTile(),
         ],
       ),
+    );
+  }
+}
+
+class VersionTile extends StatefulWidget {
+  const VersionTile({super.key});
+
+  @override
+  State<VersionTile> createState() => _VersionTileState();
+}
+
+class _VersionTileState extends State<VersionTile> {
+  late final Future<PackageInfo> _packageInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    _packageInfo = PackageInfo.fromPlatform();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<PackageInfo>(
+      future: _packageInfo,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final info = snapshot.data!;
+
+          return ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text('Version ${info.version} (build ${info.buildNumber})'),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return const ListTile(
+            leading: Icon(Icons.error_outline),
+            title: Text('Unable to load app version'),
+          );
+        }
+
+        return const ListTile(
+          leading: Icon(Icons.info_outline),
+          title: Text('Loading version...'),
+        );
+      },
     );
   }
 }
