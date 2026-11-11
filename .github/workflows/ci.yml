@@ -1,0 +1,40 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze project
+        run: flutter analyze --no-fatal-warnings
+
+      - name: Run tests
+        run: |
+          flutter test test/contentful_source_test.dart
+          flutter test test/events_test.dart --plain-name "TODO 9: cancelled events are marked"
+
+      - name: Build Flutter web
+        run: |
+          flutter build web --release
