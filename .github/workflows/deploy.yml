@@ -31,8 +31,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run Contentful tests
-        run: flutter test test/contentful_source_test.dart
+      - name: Run tests
+        run: |
+          flutter test test/contentful_source_test.dart
+          flutter test test/events_test.dart --plain-name "TODO 9: cancelled events are marked"
 
       - name: Build Flutter web
         run: >-
